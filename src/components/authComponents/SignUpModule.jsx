@@ -13,17 +13,17 @@ const SignUpModule = ({ setAuthModal, setRoute }) => {
     email: "",
     password: "",
   });
-  useEffect(() => {}, []);
   const handleChange = (e) => {
     const { id, value } = e.target;
     setValues({ ...values, [id]: value });
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!values.name) {
-      toast.error("Name is required");
-      return;
-    }
+    try {
+      if (!values.name) {
+        toast.error("Name is required");
+        return;
+      }
       if (!values.email) {
         toast.error("Insert email");
         return;
@@ -37,25 +37,26 @@ const SignUpModule = ({ setAuthModal, setRoute }) => {
           "Content-Type": "application/json",
         },
         withCredentials: true,
-
       };
-      try {
+      const loadingToast = toast.loading("Signing up...");
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
         values,
         config
       );
+      toast.dismiss(loadingToast);
       if (response.data?.success === true) {
         toast.success("Register Success | Please Login");
         setRoute("login");
+      } else if (!response.data?.success) {
+        toast.error("Registration failed");
       }
-      console.log(response);
-      
     } catch (error) {
+      toast.dismiss();
       if (error.response?.data?.message) {
-        toast.error(error.response?.data?.message);
+        toast.error(error.response.data.message);
       } else {
-        toast.error("something went wrong");
+        toast.error("Something went wrong during signup");
       }
     }
   };

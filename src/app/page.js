@@ -9,8 +9,9 @@ export default function Home() {
   const [rooms, setRooms] = useState([]);
   useEffect(() => {
     getAllRoom();
+    
+   
   }, []);
-
   const getAllRoom = async () => {
     const config = {
       headers: {

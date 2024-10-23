@@ -26,7 +26,7 @@ const AuthModal = ({ isAuthModal, setAuthModal }) => {
 
           {/* Modal Title */}
           <Typography
-            className="dark:text-white text-black"
+            className="text-black"
             variant="h6"
             component="h2"
           >

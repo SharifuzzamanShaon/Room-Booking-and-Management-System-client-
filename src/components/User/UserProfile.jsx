@@ -22,6 +22,7 @@ export default function UserProfile() {
   const handleLogout = () => {
     dispatch({ type: "LOGOUT" });
     toast.success("You are logged out");
+    router.push("/");
   };
   const redirectToBookingHistory = () => {
     router.push("/booking-history");

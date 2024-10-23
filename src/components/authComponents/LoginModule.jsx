@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import FormControl from "@mui/material/FormControl";
-import { style } from "../../utils/styles";
 import { Button, FormHelperText, Input, InputLabel } from "@mui/material";
 import { BiHide, BiShow } from "react-icons/bi";
 import toast from "react-hot-toast";
@@ -22,37 +21,46 @@ const LoginModule = ({ route, setRoute, setAuthModal }) => {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validate input fields
+    if (!values.email || !values.password) {
+      toast.error(values.email ? "Insert password" : "Insert email");
+      return;
+    }
+
+    // Show loading toast
+    const loadingToast = toast.loading("Logging in...");
+
     try {
-      if (!values.email) {
-        toast.error("Insert email");
-        return;
-      }
-      if (!values.password) {
-        toast.error("Insert password");
-        return;
-      }
-      const config = {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        withCredentials: true,
-      };
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
         values,
-        config
+        {
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
+        }
       );
-      if (response.data?.success === true) {
-        toast.success("Login Success");
+
+      if (response.data?.success) {
+        toast.success("Login successful");
+        toast(
+          "Please enable third-party cookies in your browser settings for the best experience.",
+          {
+            duration: 9000,
+          }
+        );
         dispatch({ type: "SET_USER", payload: response.data });
         setAuthModal(false);
+      } else if (!response.data?.success) {
+        toast.error("Login failed. Please check your credentials.");
       }
     } catch (error) {
-      if (error.response?.data?.message) {
-        toast.error(error.response?.data?.message);
-      } else {
-        toast.error("something went wrong");
-      }
+      const errorMessage =
+        error.response?.data?.message ||
+        "Something went wrong. Please try again.";
+      toast.error(errorMessage);
+    } finally {
+      toast.dismiss(loadingToast);
     }
   };
   return (
